@@ -19,8 +19,8 @@ if (body) {
     let defaultResponse = {
       "ok": true,
       "online": true,
-      "autoDispatch": false,
-      "myDestinationDispatch": false,
+      "autoDispatch": true,
+      "myDestinationDispatch": true,
       "myDestinationPoint": {
         "latitude": 10.794218063354492,
         "longitude": 106.6304931640625,
