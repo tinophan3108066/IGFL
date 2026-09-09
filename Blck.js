@@ -1,6 +1,7 @@
 /**
- * Script mock response cho Tada Driver
- * Xử lý riêng biệt cho 2 URL: set-online và status
+ * Script Blck.js - GSM Driver Mock
+ * 1. Tắt Green Express - Siêu tốc & Green Express - 2H
+ * 2. Bypass face verification (checkin_status = SUCCESS)
  */
 
 const url = $request.url;
@@ -10,21 +11,22 @@ if (body) {
   try {
     let obj = JSON.parse(body);
 
-    // 1. Xử lý cho URL set-online
-    if (url.includes("/membersvc/api/v1/drivers/me/set-online")) {
-      obj.ok = true;
-      obj.online = true;
-      obj.autoDispatch = true;
-      obj.myDestinationDispatch = true;
+    // 1. Xử lý tắt dịch vụ Express Siêu tốc và Express 2H
+    if (url.includes("/account-setting/v1/public/supplier/setting")) {
+      if (obj.data && obj.data.services && Array.isArray(obj.data.services.enable)) {
+        // Loại bỏ các dịch vụ có name là EXPRESS-ONDEMAND hoặc EXPRESS-SAMEDAY
+        obj.data.services.enable = obj.data.services.enable.filter(item => {
+          const name = item.name || "";
+          return name !== "EXPRESS-ONDEMAND" && name !== "EXPRESS-SAMEDAY";
+        });
+      }
     } 
-    // 2. Xử lý cho URL status
-    else if (url.includes("/dispatchsvc/v1/drivers/status")) {
-      obj.online = true;
-      obj.autoDispatch = true;
-      obj.autoDispatchAvailable = true;
-      obj.autoDispatchEligible = true;
-      obj.myDestinationDispatch = true;
-      obj.myDestinationAvailable = true;
+    // 2. Xử lý xác thực khuôn mặt (checkin_status = SUCCESS)
+    else if (url.includes("/account/v1/public/supplier/face-verification")) {
+      if (obj.data) {
+        obj.data.checkin_status = "SUCCESS";
+        obj.data.checkin_matching_rate = 100;
+      }
     }
 
     $done({ body: JSON.stringify(obj) });
