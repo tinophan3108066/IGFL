@@ -1,7 +1,8 @@
 /**
  * Script Blck.js - GSM Driver Mock
- * 1. Chỉ giữ lại Green Express - Siêu tốc (EXPRESS-ONDEMAND), loại bỏ Xanh chuyến và Express 2H
- * 2. Bypass face verification (checkin_status = SUCCESS)
+ * 1. Set stop_accept = false, auto_accept = false
+ * 2. Chỉ giữ lại Green Express - Siêu tốc (EXPRESS-ONDEMAND)
+ * 3. Bypass face verification (checkin_status = SUCCESS)
  */
 
 const url = $request.url;
@@ -11,10 +12,19 @@ if (body) {
   try {
     let obj = JSON.parse(body);
 
-    // 1. Xử lý lọc dịch vụ: Chỉ giữ lại Express Siêu tốc
+    // 1. Xử lý cài đặt tài khoản & lọc dịch vụ
     if (url.includes("/account-setting/v1/public/supplier/setting")) {
-      if (obj.data && obj.data.services && Array.isArray(obj.data.services.enable)) {
-        obj.data.services.enable = obj.data.services.enable.filter(item => item.name === "EXPRESS-ONDEMAND");
+      if (obj.data) {
+        // Ghi đè trạng thái nhận chuyến
+        obj.data.stop_accept = false;
+        obj.data.auto_accept = false;
+
+        // Chỉ giữ lại Express Siêu tốc trong danh sách enable
+        if (obj.data.services && Array.isArray(obj.data.services.enable)) {
+          obj.data.services.enable = obj.data.services.enable.filter(
+            item => item.name === "EXPRESS-ONDEMAND"
+          );
+        }
       }
     } 
     // 2. Xử lý xác thực khuôn mặt
