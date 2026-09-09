@@ -1,6 +1,6 @@
 /**
  * Script mock response Tada Driver
- * Tự động set online: true và giữ nguyên thông tin vị trí
+ * Tự động set online: true, autoDispatch: true và giữ nguyên thông tin vị trí
  */
 
 let body = $response.body;
@@ -9,9 +9,10 @@ if (body) {
   try {
     let obj = JSON.parse(body);
 
-    // Ghi đè trạng thái online
+    // Ghi đè trạng thái online và autoDispatch
     obj.ok = true;
     obj.online = true;
+    obj.autoDispatch = true;
 
     $done({ body: JSON.stringify(obj) });
   } catch (e) {
