@@ -1,41 +1,35 @@
 /**
- * Script mock response Tada Driver
- * Tự động set online: true, autoDispatch: true và giữ nguyên thông tin vị trí
+ * Script mock response cho Tada Driver
+ * Xử lý riêng biệt cho 2 URL: set-online và status
  */
 
+const url = $request.url;
 let body = $response.body;
 
 if (body) {
   try {
     let obj = JSON.parse(body);
 
-    // Ghi đè trạng thái online và autoDispatch
-    obj.ok = true;
-    obj.online = true;
-    obj.autoDispatch = true;
+    // 1. Xử lý cho URL set-online
+    if (url.includes("/membersvc/api/v1/drivers/me/set-online")) {
+      obj.ok = true;
+      obj.online = true;
+      obj.autoDispatch = true;
+      obj.myDestinationDispatch = true;
+    } 
+    // 2. Xử lý cho URL status
+    else if (url.includes("/dispatchsvc/v1/drivers/status")) {
+      obj.online = true;
+      obj.autoDispatch = true;
+      obj.autoDispatchAvailable = true;
+      obj.autoDispatchEligible = true;
+      obj.myDestinationDispatch = true;
+      obj.myDestinationAvailable = true;
+    }
 
     $done({ body: JSON.stringify(obj) });
   } catch (e) {
-    // Nếu chưa có body hoặc parse lỗi, trả về JSON chuẩn
-    let defaultResponse = {
-      "ok": true,
-      "online": true,
-      "autoDispatch": true,
-      "myDestinationDispatch": true,
-      "myDestinationPoint": {
-        "latitude": 10.794218063354492,
-        "longitude": 106.6304931640625,
-        "name": "273 Trương Vĩnh Ký",
-        "address": "273 Trương Vĩnh Ký, Tân Sơn Nhì, Tân Phú, Thành phố Hồ Chí Minh, Việt Nam",
-        "savedLocationId": "ChIJcaIIQVUpdTERRKNsfhdeBS4",
-        "heading": null,
-        "accuracy": null,
-        "tmilliSecond": null
-      },
-      "hotpotDispatch": false,
-      "petServiceAvailable": false
-    };
-    $done({ body: JSON.stringify(defaultResponse) });
+    $done({});
   }
 } else {
   $done({});
